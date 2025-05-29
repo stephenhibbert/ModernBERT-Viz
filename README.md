@@ -2,7 +2,9 @@
 
 An interactive web application for visualizing how token embeddings evolve through the layers of ModernBERT and exploring attention patterns in real-time.
 
-![ModernBERT Analysis Interface](screenshot.png)
+![ModernBERT Analysis Interface](./static/images/1.png)
+![ModernBERT Analysis Interface](./static/images/2.png)
+![ModernBERT Analysis Interface](./static/images/3.png)
 
 ## 🎯 What is this?
 

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ModernBERT Token Analysis</title>
+    <script src="https://cdn.plot.ly/plotly-3.0.1.min.js"></script>
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <div class="main-content">
+            <div class="analysis-panel">
+                <div class="container">
+                    <div class="header">
+                        <h1>🧠 ModernBERT Token Analysis</h1>
+                        <p>Explore how token embeddings evolve through layers and attention patterns</p>
+                    </div>
+
+                    <div class="input-section">
+                        <div class="form-group">
+                            <label for="sentence-input">Enter a sentence to analyze:</label>
+                            <input type="text" id="sentence-input" placeholder="The cat sat on the mat." 
+                                   value="The cat sat on the mat.">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Select up to 6 tokens to compare trajectories:</label>
+                            <div id="token-selector" class="token-selector"></div>
+                            <div id="selected-count" class="selected-count">Select tokens after tokenizing the sentence</div>
+                        </div>
+
+                        <button id="tokenize-btn" onclick="tokenizeSentence()">Tokenize Sentence</button>
+                        <button id="analyze-btn" onclick="analyzeSentence()" disabled>Analyze Tokens</button>
+                    </div>
+
+                    <div id="loading" class="loading" style="display: none;">
+                        <div class="spinner"></div>
+                        <p>Analyzing sentence through ModernBERT layers...</p>
+                    </div>
+
+                    <div id="error" class="error" style="display: none;"></div>
+
+                    <div id="results" class="results">
+                        <div class="info-box">
+                            <strong>Token Trajectories:</strong> Shows how selected tokens move through the embedding space across layers using PCA projection. Select up to 6 tokens to compare their paths.<br>
+                            <strong>Attention Heatmaps:</strong> Displays attention patterns showing which tokens attend to which others at different layers.
+                            <br><br>
+                            <strong>Tip:</strong> Try selecting different types of tokens (content words, function words, punctuation) to see how they behave differently through the layers.
+                        </div>
+
+                        <div class="plot-container">
+                            <div class="plot-title">Token Trajectories Through Layers</div>
+                            <div id="trajectory-plot"></div>
+                            <div style="text-align: center; margin-top: 10px; color: #6c757d; font-size: 14px;">
+                                <span id="pca-variance"></span>
+                            </div>
+                        </div>
+
+                        <div class="plot-container">
+                            <div class="plot-title">Attention Patterns</div>
+                            <div class="attention-controls">
+                                <label for="layer-select">Layer:</label>
+                                <select id="layer-select" class="layer-selector" onchange="updateAttentionPlot()">
+                                </select>
+                            </div>
+                            <div id="attention-plot"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="architecture-panel">
+                <div class="architecture-header">
+                    <h2>🏗️ Model Architecture</h2>
+                    <div class="architecture-stats">
+                        <div id="total-params">Loading...</div>
+                        <div>ModernBERT-base</div>
+                    </div>
+                </div>
+                <div id="architecture-tree" class="architecture-tree">
+                    Loading architecture...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button class="toggle-architecture" onclick="toggleArchitecture()">
+        Toggle Architecture
+    </button>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
