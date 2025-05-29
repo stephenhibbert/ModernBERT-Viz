@@ -30,6 +30,14 @@
                             <div id="selected-count" class="selected-count">Select tokens after tokenizing the sentence</div>
                         </div>
 
+                        <div class="form-group">
+                            <label for="reduction-method">Dimensionality Reduction Method:</label>
+                            <select id="reduction-method" class="reduction-selector">
+                                <option value="pca">PCA (Principal Component Analysis)</option>
+                                <option value="tsne">t-SNE (t-Distributed Stochastic Neighbor Embedding)</option>
+                            </select>
+                        </div>
+
                         <button id="tokenize-btn" onclick="tokenizeSentence()">Tokenize Sentence</button>
                         <button id="analyze-btn" onclick="analyzeSentence()" disabled>Analyze Tokens</button>
                     </div>
@@ -43,17 +51,17 @@
 
                     <div id="results" class="results">
                         <div class="info-box">
-                            <strong>Token Trajectories:</strong> Shows how selected tokens move through the embedding space across layers using PCA projection. Select up to 6 tokens to compare their paths.<br>
+                            <strong>Token Trajectories:</strong> Shows how selected tokens move through the embedding space across layers using dimensionality reduction. Select up to 6 tokens to compare their paths.<br>
                             <strong>Attention Heatmaps:</strong> Displays attention patterns showing which tokens attend to which others at different layers.
                             <br><br>
-                            <strong>Tip:</strong> Try selecting different types of tokens (content words, function words, punctuation) to see how they behave differently through the layers.
+                            <strong>Tip:</strong> Try selecting different types of tokens (content words, function words, punctuation) to see how they behave differently through the layers. Use PCA for linear relationships or t-SNE for non-linear clustering.
                         </div>
 
                         <div class="plot-container">
                             <div class="plot-title">Token Trajectories Through Layers</div>
                             <div id="trajectory-plot"></div>
                             <div style="text-align: center; margin-top: 10px; color: #6c757d; font-size: 14px;">
-                                <span id="pca-variance"></span>
+                                <span id="variance-info"></span>
                             </div>
                         </div>
 

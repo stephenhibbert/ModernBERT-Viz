@@ -1,11 +1,12 @@
 """Configuration and data models for ModernBERT analysis."""
 
 from pydantic import BaseModel
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Literal
 
 class AnalysisRequest(BaseModel):
     sentence: str
     token_indices: List[int] = []  # Up to 6 token indices to compare
+    reduction_method: Literal["pca", "tsne"] = "pca"  # Dimensionality reduction method
 
 class TokenTrajectory(BaseModel):
     token: str
@@ -27,7 +28,8 @@ class AnalysisResponse(BaseModel):
     tokens: List[str]
     trajectories: List[TokenTrajectory]
     attention_data: List[AttentionData]
-    pca_explained_variance: float
+    explained_variance: float  # Works for both PCA and t-SNE (KL divergence for t-SNE)
+    reduction_method: str
     model_architecture: List[ModelArchitecture]
     total_parameters: int
 

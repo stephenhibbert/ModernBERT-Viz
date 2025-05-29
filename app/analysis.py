@@ -2,12 +2,13 @@
 
 import numpy as np
 from sklearn.decomposition import PCA
+from sklearn.manifold import TSNE
 from typing import List, Tuple
 from .config import TokenTrajectory, AttentionData
 
 def create_token_trajectories(layer_embeddings: List[np.ndarray], tokens: List[str],
-                              token_indices: List[int]) -> Tuple[List[TokenTrajectory], float]:
-    """Create 2D trajectories for specified tokens using PCA."""
+                              token_indices: List[int], reduction_method: str = "pca") -> Tuple[List[TokenTrajectory], float]:
+    """Create 2D trajectories for specified tokens using PCA or t-SNE."""
     if not token_indices:
         return [], 0.0
 
@@ -24,12 +25,18 @@ def create_token_trajectories(layer_embeddings: List[np.ndarray], tokens: List[s
     if not token_embeddings_by_layer:
         return [], 0.0
 
-    # Concatenate all embeddings for PCA fitting
+    # Concatenate all embeddings for dimensionality reduction
     all_embeddings = np.vstack(token_embeddings_by_layer)
 
-    # Fit PCA
-    pca = PCA(n_components=2, random_state=42)
-    all_projected = pca.fit_transform(all_embeddings)
+    # Apply dimensionality reduction
+    if reduction_method.lower() == "tsne":
+        reducer = TSNE(n_components=2, random_state=42, perplexity=min(30, len(all_embeddings)-1))
+        all_projected = reducer.fit_transform(all_embeddings)
+        explained_variance = float(reducer.kl_divergence_)  # Use KL divergence as metric for t-SNE
+    else:  # Default to PCA
+        reducer = PCA(n_components=2, random_state=42)
+        all_projected = reducer.fit_transform(all_embeddings)
+        explained_variance = float(np.sum(reducer.explained_variance_ratio_))
 
     # Split back into trajectories for each token
     trajectories = []
@@ -49,7 +56,6 @@ def create_token_trajectories(layer_embeddings: List[np.ndarray], tokens: List[s
             trajectory=trajectory_points
         ))
 
-    explained_variance = float(np.sum(pca.explained_variance_ratio_))
     return trajectories, explained_variance
 
 def prepare_attention_data(layer_attention: List[np.ndarray], tokens: List[str]) -> List[AttentionData]:

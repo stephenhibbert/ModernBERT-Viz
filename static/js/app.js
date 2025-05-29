@@ -95,6 +95,7 @@ async function analyzeSentence() {
     }
 
     const sentence = document.getElementById('sentence-input').value.trim();
+    const reductionMethod = document.getElementById('reduction-method').value;
     showLoading(true);
     hideError();
 
@@ -106,7 +107,8 @@ async function analyzeSentence() {
             },
             body: JSON.stringify({
                 sentence: sentence,
-                token_indices: selectedTokens
+                token_indices: selectedTokens,
+                reduction_method: reductionMethod
             })
         });
 
@@ -349,6 +351,14 @@ function plotTrajectories() {
         '#e377c2', '#7f7f7f', '#bcbd22', '#17becf', '#aec7e8', '#ffbb78'
     ];
 
+    // Define method labels early so they can be used in hovertemplate
+    const methodLabels = {
+        'pca': ['PCA Component 1', 'PCA Component 2'],
+        'tsne': ['t-SNE Dimension 1', 't-SNE Dimension 2']
+    };
+    const method = analysisData.reduction_method || 'pca';
+    const [xLabel, yLabel] = methodLabels[method] || methodLabels.pca;
+
     const traces = analysisData.trajectories.map((traj, index) => {
         const color = colorPalette[index % colorPalette.length];
 
@@ -375,7 +385,7 @@ function plotTrajectories() {
                 symbol: index % 2 === 0 ? 'circle' : 'square'
             },
             text: layerLabels,
-            hovertemplate: `<b>${traj.token}</b> (idx: ${traj.token_index})<br>%{text}<br>PCA1: %{x:.3f}<br>PCA2: %{y:.3f}<extra></extra>`
+            hovertemplate: `<b>${traj.token}</b> (idx: ${traj.token_index})<br>%{text}<br>${xLabel}: %{x:.3f}<br>${yLabel}: %{y:.3f}<extra></extra>`
         };
     });
 
@@ -420,12 +430,12 @@ function plotTrajectories() {
 
     const layout = {
         xaxis: { 
-            title: 'PCA Component 1',
+            title: xLabel,
             gridcolor: '#e0e0e0',
             zerolinecolor: '#d0d0d0'
         },
         yaxis: { 
-            title: 'PCA Component 2',
+            title: yLabel,
             gridcolor: '#e0e0e0',
             zerolinecolor: '#d0d0d0'
         },
@@ -445,9 +455,18 @@ function plotTrajectories() {
 
     Plotly.newPlot('trajectory-plot', traces, layout, {responsive: true});
 
-    const variancePercent = (analysisData.pca_explained_variance * 100).toFixed(1);
-    document.getElementById('pca-variance').innerHTML = 
-        `PCA explains <strong>${variancePercent}%</strong> of variance | Showing <strong>${analysisData.trajectories.length}</strong> token trajectories across <strong>${analysisData.trajectories[0]?.trajectory.length || 0}</strong> layers`;
+    const variance = analysisData.explained_variance;
+    let varianceText = '';
+    
+    if (method === 'pca') {
+        const variancePercent = (variance * 100).toFixed(1);
+        varianceText = `PCA explains <strong>${variancePercent}%</strong> of variance`;
+    } else if (method === 'tsne') {
+        varianceText = `t-SNE KL divergence: <strong>${variance.toFixed(3)}</strong>`;
+    }
+    
+    document.getElementById('variance-info').innerHTML = 
+        `${varianceText} | Showing <strong>${analysisData.trajectories.length}</strong> token trajectories across <strong>${analysisData.trajectories[0]?.trajectory.length || 0}</strong> layers`;
 }
 
 function setupAttentionControls() {

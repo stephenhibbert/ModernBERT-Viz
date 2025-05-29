@@ -22,8 +22,8 @@ async def analyze_sentence(request: AnalysisRequest) -> AnalysisResponse:
         valid_token_indices = validate_token_indices(request.token_indices, tokens)
 
         # Create trajectories
-        trajectories, pca_variance = create_token_trajectories(
-            layer_embeddings, tokens, valid_token_indices
+        trajectories, explained_variance = create_token_trajectories(
+            layer_embeddings, tokens, valid_token_indices, request.reduction_method
         )
 
         # Prepare attention data
@@ -37,7 +37,8 @@ async def analyze_sentence(request: AnalysisRequest) -> AnalysisResponse:
             tokens=tokens,
             trajectories=trajectories,
             attention_data=attention_data,
-            pca_explained_variance=pca_variance,
+            explained_variance=explained_variance,
+            reduction_method=request.reduction_method,
             model_architecture=model_arch,
             total_parameters=total_params
         )
